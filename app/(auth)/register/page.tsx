@@ -1,15 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { PawPrint } from "lucide-react";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -19,6 +14,11 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
