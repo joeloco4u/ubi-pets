@@ -1,48 +1,43 @@
 "use client";
 
 import { useState } from "react";
-import { createBrowserClient } from "@supabase/ssr";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { PawPrint } from "lucide-react";
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  async function register(formData: FormData) {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const fullName = formData.get("fullName") as string;
+    const phone = formData.get("phone") as string;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          phone: phone || null,
-        },
-      },
+    const response = await fetch("/api/register", {
+      method: "POST",
+      body: JSON.stringify({ email, password, fullName, phone }),
+      headers: { "Content-Type": "application/json" },
     });
 
-    if (error) {
-      setError(error.message);
+    const result = await response.json();
+
+    if (result.error) {
+      setError(result.error);
       setLoading(false);
     } else {
-      router.push("/login?registered=true");
+      window.location.href = "/login?registered=true";
     }
-  };
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    
+    const formData = new FormData(e.currentTarget);
+    await register(formData);
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#0A2540" }}>
@@ -70,9 +65,8 @@ export default function RegisterPage() {
               Nombre completo *
             </label>
             <input
+              name="fullName"
               type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none focus:border-[#FF6B35]"
               placeholder="Juan Pérez"
@@ -84,9 +78,8 @@ export default function RegisterPage() {
               Teléfono (opcional)
             </label>
             <input
+              name="phone"
               type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none focus:border-[#FF6B35]"
               placeholder="+34 612 345 678"
             />
@@ -97,9 +90,8 @@ export default function RegisterPage() {
               Correo electrónico *
             </label>
             <input
+              name="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none focus:border-[#FF6B35]"
               placeholder="tu@email.com"
@@ -111,9 +103,8 @@ export default function RegisterPage() {
               Contraseña *
             </label>
             <input
+              name="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none focus:border-[#FF6B35]"
