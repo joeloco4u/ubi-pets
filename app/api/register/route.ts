@@ -33,10 +33,12 @@ export async function POST(request: Request) {
     id: user.id,
     full_name: fullName,
     phone: phone || null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   });
 
   if (profileError) {
-    return NextResponse.json({ error: "Usuario creado pero error al crear perfil" }, { status: 400 });
+    return NextResponse.json({ error: profileError.message, details: profileError.details, hint: profileError.hint }, { status: 400 });
   }
 
   return NextResponse.json({ success: true });
