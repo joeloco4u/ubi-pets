@@ -42,21 +42,19 @@ export async function POST(request: Request) {
       );
     }
 
-    const now = new Date().toISOString();
     const { error: profileError } = await supabaseAdmin.from("profiles").insert({
       id: user.id,
       full_name: fullName,
       phone: phone || null,
-      created_at: now,
-      updated_at: now,
     });
 
     if (profileError) {
       return NextResponse.json(
-        { 
+        {
           error: profileError.message,
           code: profileError.code,
-          details: profileError.details
+          details: profileError.details,
+          hint: profileError.hint
         },
         { status: 400 }
       );
