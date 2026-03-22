@@ -17,32 +17,40 @@ export default function PetsPage() {
   const [name, setName] = useState("");
   const [species, setSpecies] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetchPets();
-  }, []);
+  const [message, setMessage] = useState("");
 
   const fetchPets = async () => {
     const { data } = await supabase.from("pets").select("*");
     setPets(data || []);
   };
 
+  useEffect(() => {
+    fetchPets();
+  }, []);
+
   const addPet = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !species) return;
 
     setLoading(true);
+    setMessage("");
+
     const { data: { user } } = await supabase.auth.getUser();
 
-    await supabase.from("pets").insert({
+    const { error } = await supabase.from("pets").insert({
       name,
       species,
       owner_id: user?.id,
     });
 
-    setName("");
-    setSpecies("");
-    fetchPets();
+    if (error) {
+      setMessage("Error: " + error.message);
+    } else {
+      setMessage("¡Mascota agregada correctamente!");
+      setName("");
+      setSpecies("");
+      await fetchPets();
+    }
     setLoading(false);
   };
 
@@ -54,34 +62,36 @@ export default function PetsPage() {
         </h1>
 
         <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Agregar nueva mascota</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Agregar nueva mascota</CardTitle></CardHeader>
           <CardContent>
             <form onSubmit={addPet} className="space-y-4">
-              <Input placeholder="Nombre" value={name} onChange={(e) => setName(e.target.value)} required />
-              <Input placeholder="Especie (perro, gato...)" value={species} onChange={(e) => setSpecies(e.target.value)} required />
+              <Input placeholder="Nombre" value={name} onChange={e => setName(e.target.value)} required />
+              <Input placeholder="Especie (perro, gato...)" value={species} onChange={e => setSpecies(e.target.value)} required />
               <Button type="submit" disabled={loading} className="w-full bg-[#FF6B35]">
-                <Plus className="mr-2 h-4 w-4" />
-                {loading ? "Guardando..." : "Agregar Mascota"}
+                <Plus className="mr-2 h-4 w-4" /> {loading ? "Guardando..." : "Agregar Mascota"}
               </Button>
             </form>
+            {message && <p className="mt-3 text-center text-sm font-medium text-green-600">{message}</p>}
           </CardContent>
         </Card>
 
         <div className="space-y-4">
-          {pets.map((pet) => (
-            <Card key={pet.id} className="p-6 flex justify-between items-center">
-              <div>
-                <h3 className="text-2xl font-bold">{pet.name}</h3>
-                <p className="text-gray-600">{pet.species}</p>
-              </div>
-              <QRCodeGenerator 
-                data={`https://ubi-petsweb-gib0idwgy-joeloco4us-projects.vercel.app/pet/${pet.id}`}
-                petName={pet.name}
-              />
-            </Card>
-          ))}
+          {pets.length === 0 ? (
+            <p className="text-center py-12 text-gray-500">Aún no tienes mascotas. Agrega la primera arriba.</p>
+          ) : (
+            pets.map((pet) => (
+              <Card key={pet.id} className="p-6 flex justify-between items-center">
+                <div>
+                  <h3 className="text-2xl font-bold">{pet.name}</h3>
+                  <p className="text-gray-600">{pet.species}</p>
+                </div>
+                <QRCodeGenerator 
+                  data={`https://ubi-petsweb-gib0idwgy-joeloco4us-projects.vercel.app/pet/${pet.id}`} 
+                  petName={pet.name} 
+                />
+              </Card>
+            ))
+          )}
         </div>
       </div>
     </div>
