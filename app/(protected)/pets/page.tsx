@@ -6,11 +6,19 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PawPrint, Plus } from "lucide-react";
 import { QRCodeGenerator } from "@/components/qr-code";
+import { z } from "zod";
+
+const petSchema = z.object({
+  name: z.string().min(1, "El nombre es requerido"),
+  species: z.string().min(3, "La especie debe tener al menos 3 caracteres"),
+});
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
+
+const BASE_URL = "https://ubi-petsweb-gib0idwgy-joeloco4us-projects.vercel.app";
 
 export default function PetsPage() {
   const [pets, setPets] = useState<any[]>([]);
@@ -18,6 +26,7 @@ export default function PetsPage() {
   const [species, setSpecies] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState<{ name?: string; species?: string }>({});
 
   const fetchPets = async () => {
     const { data } = await supabase.from("pets").select("*");
@@ -30,10 +39,20 @@ export default function PetsPage() {
 
   const addPet = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !species) return;
+    setErrors({});
+    setMessage("");
+
+    const result = petSchema.safeParse({ name, species });
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+      setErrors({
+        name: fieldErrors.name?.[0],
+        species: fieldErrors.species?.[0],
+      });
+      return;
+    }
 
     setLoading(true);
-    setMessage("");
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -65,13 +84,33 @@ export default function PetsPage() {
           <CardHeader><CardTitle>Agregar nueva mascota</CardTitle></CardHeader>
           <CardContent>
             <form onSubmit={addPet} className="space-y-4">
-              <Input placeholder="Nombre" value={name} onChange={e => setName(e.target.value)} required />
-              <Input placeholder="Especie (perro, gato...)" value={species} onChange={e => setSpecies(e.target.value)} required />
+              <div>
+                <Input 
+                  placeholder="Nombre" 
+                  value={name} 
+                  onChange={e => setName(e.target.value)} 
+                  required 
+                />
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              </div>
+              <div>
+                <Input 
+                  placeholder="Especie (perro, gato...)" 
+                  value={species} 
+                  onChange={e => setSpecies(e.target.value)} 
+                  required 
+                />
+                {errors.species && <p className="text-red-500 text-sm mt-1">{errors.species}</p>}
+              </div>
               <Button type="submit" disabled={loading} className="w-full bg-[#FF6B35]">
                 <Plus className="mr-2 h-4 w-4" /> {loading ? "Guardando..." : "Agregar Mascota"}
               </Button>
             </form>
-            {message && <p className="mt-3 text-center text-sm font-medium text-green-600">{message}</p>}
+            {message && (
+              <p className={`mt-3 text-center text-sm font-medium ${message.startsWith("Error") ? "text-red-600" : "text-green-600"}`}>
+                {message}
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -86,7 +125,7 @@ export default function PetsPage() {
                   <p className="text-gray-600">{pet.species}</p>
                 </div>
                 <QRCodeGenerator 
-                  data={`https://ubi-petsweb-gib0idwgy-joeloco4us-projects.vercel.app/pet/${pet.id}`} 
+                  data={`${BASE_URL}/pet/${pet.id}`}
                   petName={pet.name} 
                 />
               </Card>
