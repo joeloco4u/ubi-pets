@@ -10,7 +10,10 @@ import { z } from "zod";
 
 const petSchema = z.object({
   name: z.string().min(1, "El nombre es requerido"),
-  species: z.string().min(3, "La especie debe tener al menos 3 caracteres"),
+  species: z.string().refine(
+    (val) => ["perro", "gato"].includes(val.toLowerCase()),
+    { message: "La especie debe ser Perro o Gato" }
+  ),
 });
 
 const supabase = createBrowserClient(
