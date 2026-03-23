@@ -4,7 +4,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PawPrint, Plus } from "lucide-react";
+import { PawPrint, Plus, Trash2 } from "lucide-react";
 import { QRCodeGenerator } from "@/components/qr-code";
 import { z } from "zod";
 
@@ -76,6 +76,15 @@ export default function PetsPage() {
     setLoading(false);
   };
 
+  const deletePet = async (petId: string) => {
+    if (!confirm("¿Estás seguro de que quieres eliminar esta mascota?")) return;
+    
+    const { error } = await supabase.from("pets").delete().eq("id", petId);
+    if (!error) {
+      await fetchPets();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
@@ -127,10 +136,19 @@ export default function PetsPage() {
                   <h3 className="text-2xl font-bold">{pet.name}</h3>
                   <p className="text-gray-600">{pet.species}</p>
                 </div>
-                <QRCodeGenerator 
-                  data={`${BASE_URL}/pet/${pet.id}`}
-                  petName={pet.name} 
-                />
+                <div className="flex items-center gap-4">
+                  <QRCodeGenerator 
+                    data={`${BASE_URL}/pet/${pet.id}`}
+                    petName={pet.name} 
+                  />
+                  <button
+                    onClick={() => deletePet(pet.id)}
+                    className="p-3 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Eliminar mascota"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
               </Card>
             ))
           )}
