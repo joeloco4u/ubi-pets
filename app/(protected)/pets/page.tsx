@@ -16,7 +16,7 @@ const petSchema = z.object({
   ),
 });
 
-const BASE_URL = "https://ubi-petsweb-gib0idwgy-joeloco4us-projects.vercel.app";
+const BASE_URL = "https://ubi-petsweb.vercel.app";
 
 export default function PetsPage() {
   const [pets, setPets] = useState<any[]>([]);
