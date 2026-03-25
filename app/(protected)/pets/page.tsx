@@ -22,6 +22,8 @@ export default function PetsPage() {
   const [pets, setPets] = useState<any[]>([]);
   const [name, setName] = useState("");
   const [species, setSpecies] = useState("");
+  const [medicalNotes, setMedicalNotes] = useState("");
+  const [ownerPhone, setOwnerPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<{ name?: string; species?: string }>({});
@@ -58,6 +60,8 @@ export default function PetsPage() {
       name,
       species,
       owner_id: user?.id,
+      medical_notes: medicalNotes,
+      owner_phone: ownerPhone,
     });
 
     if (error) {
@@ -66,6 +70,8 @@ export default function PetsPage() {
       setMessage("¡Mascota agregada correctamente!");
       setName("");
       setSpecies("");
+      setMedicalNotes("");
+      setOwnerPhone("");
       await fetchPets();
     }
     setLoading(false);
@@ -108,6 +114,20 @@ export default function PetsPage() {
                   required 
                 />
                 {errors.species && <p className="text-red-500 text-sm mt-1">{errors.species}</p>}
+              </div>
+              <div>
+                <Input 
+                  placeholder="Alergias o medicamentos" 
+                  value={medicalNotes} 
+                  onChange={e => setMedicalNotes(e.target.value)} 
+                />
+              </div>
+              <div>
+                <Input 
+                  placeholder="Teléfono de contacto" 
+                  value={ownerPhone} 
+                  onChange={e => setOwnerPhone(e.target.value)} 
+                />
               </div>
               <Button type="submit" disabled={loading} className="w-full bg-[#FF6B35]">
                 <Plus className="mr-2 h-4 w-4" /> {loading ? "Guardando..." : "Agregar Mascota"}

@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase-browser";
-import { Phone, PawPrint } from "lucide-react";
+import { Phone, PawPrint, Heart } from "lucide-react";
+import Link from "next/link";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -37,10 +38,31 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           {pet.species}
         </span>
 
-        <button className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-semibold py-4 px-6 rounded-2xl transition-colors flex items-center justify-center gap-2">
-          <Phone className="h-5 w-5" />
-          ¡Contactar al dueño!
-        </button>
+        {pet.medical_notes && (
+          <div className="mb-6 p-4 bg-blue-50 rounded-xl text-left">
+            <h3 className="flex items-center gap-2 text-[#0A2540] font-semibold mb-2">
+              <Heart className="h-4 w-4 text-[#FF6B35]" />
+              Información Médica
+            </h3>
+            <p className="text-gray-700 text-sm">{pet.medical_notes}</p>
+          </div>
+        )}
+
+        {pet.owner_phone ? (
+          <Link 
+            href={`https://wa.me/${pet.owner_phone.replace(/\D/g, '')}`}
+            target="_blank"
+            className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-semibold py-4 px-6 rounded-2xl transition-colors flex items-center justify-center gap-2"
+          >
+            <Phone className="h-5 w-5" />
+            ¡Contactar al dueño!
+          </Link>
+        ) : (
+          <button className="w-full bg-gray-300 text-gray-500 font-semibold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 cursor-not-allowed" disabled>
+            <Phone className="h-5 w-5" />
+            Contacto no disponible
+          </button>
+        )}
       </div>
     </div>
   );
