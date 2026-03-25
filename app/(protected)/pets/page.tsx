@@ -133,7 +133,7 @@ export default function PetsPage() {
                 </div>
                 <div className="flex items-center gap-4">
                   <QRCodeGenerator 
-                    data={`${BASE_URL}/pet/${pet.id}`}
+                    data={`${BASE_URL}/p/${pet.id}`}
                     petName={pet.name} 
                   />
                   <button
