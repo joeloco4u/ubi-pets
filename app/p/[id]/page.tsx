@@ -18,12 +18,26 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [loading, setLoading] = useState(true);
   const [locationStatus, setLocationStatus] = useState<string>("");
   const [buttonText, setButtonText] = useState("¡Contactar al dueño!");
-  const [id, setId] = useState<string>("");
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
 
   useEffect(() => {
-    const getPet = async () => {
+    const init = async () => {
       const { id: petId } = await params;
-      setId(petId);
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLat(position.coords.latitude);
+          setLng(position.coords.longitude);
+          setLocationStatus("📍 Ubicación capturada");
+          logScan(petId, position.coords.latitude, position.coords.longitude);
+        },
+        () => {
+          setLocationStatus("Ubicación no disponible");
+          logScan(petId, null, null);
+        },
+        { timeout: 5000 }
+      );
 
       const { data, error } = await supabase
         .from("pets")
@@ -33,43 +47,38 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
       if (!error && data) {
         setPet(data);
-        logScan(petId);
       }
       setLoading(false);
     };
 
-    getPet();
+    init();
   }, [params]);
 
-  const logScan = async (petId: string) => {
-    let lat: number | null = null;
-    let lng: number | null = null;
-
-    try {
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
-      });
-      lat = position.coords.latitude;
-      lng = position.coords.longitude;
-      setLocationStatus("📍 Ubicación capturada");
-    } catch (e) {
-      setLocationStatus("Ubicación no disponible");
-    }
-
+  const logScan = async (petId: string, latVal: number | null, lngVal: number | null) => {
     await supabase.from("scans").insert({
       pet_id: petId,
-      lat,
-      lng,
+      lat: latVal,
+      lng: lngVal,
     });
   };
 
-  const handleContact = async () => {
-    setButtonText("¡Ubicación enviada al dueño! 📍");
+  const handleContact = () => {
+    if (!pet?.owner_phone) return;
+    
+    setButtonText("Abriendo WhatsApp...");
+    
+    let message = `Hola, encontré a tu mascota ${pet.name}.`;
+    if (lat && lng) {
+      message += ` Mi ubicación actual es: https://maps.google.com/?q=${lat},${lng}`;
+    }
+    
+    const encodedMessage = encodeURIComponent(message);
+    const waUrl = `https://wa.me/${pet.owner_phone.replace(/\D/g, '')}?text=${encodedMessage}`;
+    
     setTimeout(() => {
-      if (pet?.owner_phone) {
-        window.open(`https://wa.me/${pet.owner_phone.replace(/\D/g, '')}`, "_blank");
-      }
-    }, 1500);
+      window.open(waUrl, "_blank");
+      setButtonText("¡Contactar al dueño!");
+    }, 500);
   };
 
   if (loading) {

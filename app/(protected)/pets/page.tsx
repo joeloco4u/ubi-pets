@@ -144,17 +144,17 @@ export default function PetsPage() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {pets.length === 0 ? (
             <p className="col-span-full text-center py-12 text-gray-500">Aún no tienes mascotas. Agrega la primera arriba.</p>
           ) : (
             pets.map((pet) => (
-              <Card key={pet.id} className="p-4 sm:p-6 flex flex-col justify-between items-center">
+              <Card key={pet.id} className="p-6 flex flex-col items-center">
                 <div className="text-center mb-4">
-                  <h3 className="text-xl sm:text-2xl font-bold">{pet.name}</h3>
-                  <p className="text-gray-600">{pet.species}</p>
+                  <h3 className="text-2xl font-bold text-[#0A2540]">{pet.name}</h3>
+                  <span className="text-sm text-[#FF6B35] font-medium">{pet.species}</span>
                 </div>
-                <div className="flex flex-col sm:flex-row items-center gap-3">
+                <div className="flex items-center gap-3">
                   <QRCodeGenerator 
                     data={`${BASE_URL}/p/${pet.id}`}
                     petName={pet.name} 
