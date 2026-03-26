@@ -1,17 +1,86 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase-browser";
-import { Phone, PawPrint, Heart } from "lucide-react";
+import { Phone, PawPrint, Heart, MapPin } from "lucide-react";
 import Link from "next/link";
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+interface PetData {
+  id: string;
+  name: string;
+  species: string;
+  medical_notes: string | null;
+  owner_phone: string | null;
+}
 
-  const { data: pet, error } = await supabase
-    .from("pets")
-    .select("*")
-    .eq("id", id)
-    .single();
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
+  const [pet, setPet] = useState<PetData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [locationStatus, setLocationStatus] = useState<string>("");
+  const [buttonText, setButtonText] = useState("¡Contactar al dueño!");
+  const [id, setId] = useState<string>("");
 
-  if (error || !pet) {
+  useEffect(() => {
+    const getPet = async () => {
+      const { id: petId } = await params;
+      setId(petId);
+
+      const { data, error } = await supabase
+        .from("pets")
+        .select("*")
+        .eq("id", petId)
+        .single();
+
+      if (!error && data) {
+        setPet(data);
+        logScan(petId);
+      }
+      setLoading(false);
+    };
+
+    getPet();
+  }, [params]);
+
+  const logScan = async (petId: string) => {
+    let lat: number | null = null;
+    let lng: number | null = null;
+
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+      });
+      lat = position.coords.latitude;
+      lng = position.coords.longitude;
+      setLocationStatus("📍 Ubicación capturada");
+    } catch (e) {
+      setLocationStatus("Ubicación no disponible");
+    }
+
+    await supabase.from("scans").insert({
+      pet_id: petId,
+      lat,
+      lng,
+    });
+  };
+
+  const handleContact = async () => {
+    setButtonText("¡Ubicación enviada al dueño! 📍");
+    setTimeout(() => {
+      if (pet?.owner_phone) {
+        window.open(`https://wa.me/${pet.owner_phone.replace(/\D/g, '')}`, "_blank");
+      }
+    }, 1500);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FF6B35]"></div>
+      </div>
+    );
+  }
+
+  if (!pet) {
     return (
       <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl shadow-lg p-12 text-center max-w-md">
@@ -25,6 +94,11 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center px-4 py-4">
+      {locationStatus && (
+        <div className="text-xs text-gray-400 mb-2 flex items-center gap-1">
+          <MapPin className="w-3 h-3" /> {locationStatus}
+        </div>
+      )}
       <Link href="/" className="text-[#0A2540] hover:text-[#FF6B35] transition-colors mb-4 text-sm font-medium">
         ← Ir a Ubi Pets
       </Link>
@@ -52,14 +126,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         )}
 
         {pet.owner_phone ? (
-          <Link 
-            href={`https://wa.me/${pet.owner_phone.replace(/\D/g, '')}`}
-            target="_blank"
+          <button 
+            onClick={handleContact}
             className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-semibold py-4 px-6 rounded-2xl transition-colors flex items-center justify-center gap-2 text-base sm:text-lg touch-manipulation"
           >
             <Phone className="h-5 w-5" />
-            ¡Contactar al dueño!
-          </Link>
+            {buttonText}
+          </button>
         ) : (
           <button className="w-full bg-gray-300 text-gray-500 font-semibold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 cursor-not-allowed" disabled>
             <Phone className="h-5 w-5" />
