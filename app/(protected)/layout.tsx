@@ -35,7 +35,7 @@ export default async function ProtectedLayout({
   return (
     <>
       <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <PawPrint className="h-6 w-6" />
             <span className="font-bold text-xl">Ubi Pets</span>

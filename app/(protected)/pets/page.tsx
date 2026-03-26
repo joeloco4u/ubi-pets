@@ -90,10 +90,10 @@ export default function PetsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <Link href="/" className="block mb-8 flex items-center gap-3 text-4xl font-bold text-[#0A2540] hover:opacity-80 transition-opacity cursor-pointer">
-          <PawPrint className="h-10 w-10 text-[#FF6B35]" /> Mis Mascotas
+        <Link href="/" className="block mb-8 flex items-center gap-3 text-3xl sm:text-4xl font-bold text-[#0A2540] hover:opacity-80 transition-opacity cursor-pointer">
+          <PawPrint className="h-8 sm:h-10 w-8 sm:w-10 text-[#FF6B35]" /> Mis Mascotas
         </Link>
 
         <Card className="mb-8">
@@ -144,17 +144,17 @@ export default function PetsPage() {
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {pets.length === 0 ? (
-            <p className="text-center py-12 text-gray-500">Aún no tienes mascotas. Agrega la primera arriba.</p>
+            <p className="col-span-full text-center py-12 text-gray-500">Aún no tienes mascotas. Agrega la primera arriba.</p>
           ) : (
             pets.map((pet) => (
-              <Card key={pet.id} className="p-6 flex justify-between items-center">
-                <div>
-                  <h3 className="text-2xl font-bold">{pet.name}</h3>
+              <Card key={pet.id} className="p-4 sm:p-6 flex flex-col justify-between items-center">
+                <div className="text-center mb-4">
+                  <h3 className="text-xl sm:text-2xl font-bold">{pet.name}</h3>
                   <p className="text-gray-600">{pet.species}</p>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-center gap-3">
                   <QRCodeGenerator 
                     data={`${BASE_URL}/p/${pet.id}`}
                     petName={pet.name} 

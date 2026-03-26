@@ -24,18 +24,18 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center px-4 py-4">
       <Link href="/" className="text-[#0A2540] hover:text-[#FF6B35] transition-colors mb-4 text-sm font-medium">
         ← Ir a Ubi Pets
       </Link>
-      <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
+      <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 max-w-md w-full text-center">
         <div className="mb-6">
-          <div className="bg-[#0A2540] w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <PawPrint className="h-10 w-10 text-white" />
+          <div className="bg-[#0A2540] w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <PawPrint className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
           </div>
         </div>
         
-        <h1 className="text-4xl font-bold text-[#0A2540] mb-3">{pet.name}</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold text-[#0A2540] mb-3">{pet.name}</h1>
         
         <span className="inline-block bg-[#FF7F50] text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
           {pet.species}
@@ -55,7 +55,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <Link 
             href={`https://wa.me/${pet.owner_phone.replace(/\D/g, '')}`}
             target="_blank"
-            className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-semibold py-4 px-6 rounded-2xl transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-semibold py-4 px-6 rounded-2xl transition-colors flex items-center justify-center gap-2 text-base sm:text-lg touch-manipulation"
           >
             <Phone className="h-5 w-5" />
             ¡Contactar al dueño!
