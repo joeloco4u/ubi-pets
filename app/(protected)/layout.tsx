@@ -1,30 +1,10 @@
-"use client";
-
 import { redirect } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { Button } from "@/components/ui/button";
 import { PawPrint } from "lucide-react";
 import Link from "next/link";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-function LogoutButton() {
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/";
-  };
-
-  return (
-    <Button variant="outline" onClick={handleSignOut}>
-      Cerrar Sesión
-    </Button>
-  );
-}
+import { LogoutButton } from "@/components/logout-button";
 
 async function getUser() {
   const cookieStore = await cookies();
