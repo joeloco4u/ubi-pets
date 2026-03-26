@@ -19,29 +19,24 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [locationStatus, setLocationStatus] = useState<string>("");
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
-  const [gpsRequested, setGpsRequested] = useState(false);
 
   useEffect(() => {
     const init = async () => {
       const { id: petId } = await params;
-      console.log("Solicitando GPS...");
 
-      if (!gpsRequested) {
-        setGpsRequested(true);
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setLat(position.coords.latitude);
-            setLng(position.coords.longitude);
-            setLocationStatus("📍 Ubicación capturada");
-            logScan(petId, position.coords.latitude, position.coords.longitude);
-          },
-          () => {
-            setLocationStatus("Ubicación no disponible");
-            logScan(petId, null, null);
-          },
-          { timeout: 5000 }
-        );
-      }
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLat(position.coords.latitude);
+          setLng(position.coords.longitude);
+          setLocationStatus("📍 Ubicación capturada");
+          logScan(petId, position.coords.latitude, position.coords.longitude);
+        },
+        () => {
+          setLocationStatus("Ubicación no disponible");
+          logScan(petId, null, null);
+        },
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
 
       const { data, error } = await supabase
         .from("pets")
@@ -56,26 +51,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     };
 
     init();
-  }, [params, gpsRequested]);
-
-  const requestGps = () => {
-    const getPetId = async () => {
-      const { id: petId } = await params;
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLat(position.coords.latitude);
-          setLng(position.coords.longitude);
-          setLocationStatus("📍 Ubicación capturada");
-          logScan(petId, position.coords.latitude, position.coords.longitude);
-        },
-        () => {
-          setLocationStatus("Ubicación denegada");
-        },
-        { timeout: 5000 }
-      );
-    };
-    getPetId();
-  };
+  }, [params]);
 
   const logScan = async (petId: string, latVal: number | null, lngVal: number | null) => {
     await supabase.from("scans").insert({
@@ -90,8 +66,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     
     const googleMapsLink = lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : "";
     const message = lat && lng 
-      ? `Hola! Encontré a tu mascota *${pet.name}*. Mi ubicación actual es: ${googleMapsLink}`
-      : `Hola! Encontré a tu mascota *${pet.name}*. Por favor contáctame.`;
+      ? `Hola! Encontré a tu mascota ${pet.name}. Mi ubicación actual es: ${googleMapsLink}`
+      : `Hola! Encontré a tu mascota ${pet.name}. Por favor contáctame pronto.`;
     
     const encodedMessage = encodeURIComponent(message);
     const waUrl = `https://wa.me/${pet.owner_phone.replace(/\D/g, '')}?text=${encodedMessage}`;
@@ -125,15 +101,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         <div className="text-xs text-gray-400 mb-2 flex items-center gap-1">
           <MapPin className="w-3 h-3" /> {locationStatus}
         </div>
-      )}
-      
-      {!locationStatus && (
-        <button 
-          onClick={requestGps}
-          className="mb-4 text-sm text-[#FF6B35] font-medium border border-[#FF6B35] px-4 py-2 rounded-full hover:bg-[#FF6B35] hover:text-white transition-colors"
-        >
-          📍 Activar ubicación para reportar hallazgo
-        </button>
       )}
       
       <Link href="/" className="text-[#0A2540] hover:text-[#FF6B35] transition-colors mb-4 text-sm font-medium">
