@@ -24,7 +24,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4">
+      <Link href="/" className="text-[#0A2540] hover:text-[#FF6B35] transition-colors mb-4 text-sm font-medium">
+        ← Ir a Ubi Pets
+      </Link>
       <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
         <div className="mb-6">
           <div className="bg-[#0A2540] w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -63,6 +66,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             Contacto no disponible
           </button>
         )}
+
+        <p className="mt-6 text-sm text-gray-500">
+          ¿Quieres proteger a tu mascota?{" "}
+          <Link href="/register" className="text-[#FF6B35] font-semibold hover:underline">
+            Crea tu cuenta en Ubi Pets gratis.
+          </Link>
+        </p>
       </div>
     </div>
   );

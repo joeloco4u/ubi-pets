@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PawPrint, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { QRCodeGenerator } from "@/components/qr-code";
 import { z } from "zod";
 
@@ -91,9 +92,9 @@ export default function PetsPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-[#0A2540] mb-8 flex items-center gap-3">
+        <Link href="/" className="block mb-8 flex items-center gap-3 text-4xl font-bold text-[#0A2540] hover:opacity-80 transition-opacity cursor-pointer">
           <PawPrint className="h-10 w-10 text-[#FF6B35]" /> Mis Mascotas
-        </h1>
+        </Link>
 
         <Card className="mb-8">
           <CardHeader><CardTitle>Agregar nueva mascota</CardTitle></CardHeader>

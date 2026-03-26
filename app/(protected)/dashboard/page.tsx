@@ -1,4 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
+import Link from "next/link";
+import { PawPrint } from "lucide-react";
 import { cookies } from "next/headers";
 
 async function getUser() {
@@ -25,8 +27,12 @@ export default async function DashboardPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Link href="/" className="inline-flex items-center gap-2 mb-6 hover:opacity-80 transition-opacity cursor-pointer">
+        <PawPrint className="h-8 w-8" style={{ color: "#FF6B35" }} />
+        <span className="font-bold text-xl">Ubi Pets</span>
+      </Link>
       <h1 className="text-3xl font-bold mb-4" style={{ color: "#FF6B35" }}>
-        Dashboard - Ubi Pets
+        Dashboard
       </h1>
       <p className="text-xl mb-8">Bienvenido, {userName}</p>
     </div>

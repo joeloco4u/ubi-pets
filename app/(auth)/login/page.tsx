@@ -35,7 +35,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#0A2540" }}>
       <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2">
+          <Link href="/" className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
             <PawPrint className="h-10 w-10" style={{ color: "#FF6B35" }} />
             <span className="font-bold text-2xl" style={{ color: "#0A2540" }}>Ubi Pets</span>
           </Link>
