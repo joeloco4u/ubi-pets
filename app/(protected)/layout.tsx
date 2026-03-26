@@ -1,8 +1,30 @@
+"use client";
+
 import { redirect } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { Button } from "@/components/ui/button";
 import { PawPrint } from "lucide-react";
+import Link from "next/link";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+function LogoutButton() {
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  };
+
+  return (
+    <Button variant="outline" onClick={handleSignOut}>
+      Cerrar Sesión
+    </Button>
+  );
+}
 
 async function getUser() {
   const cookieStore = await cookies();
@@ -34,10 +56,10 @@ export default async function ProtectedLayout({
     <>
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <PawPrint className="h-6 w-6" />
             <span className="font-bold text-xl">Ubi Pets</span>
-          </div>
+          </Link>
           <nav className="flex items-center gap-4">
             <Button variant="ghost" asChild>
               <a href="/dashboard">Dashboard</a>
@@ -45,11 +67,7 @@ export default async function ProtectedLayout({
             <Button variant="ghost" asChild>
               <a href="/pets">Mis Mascotas</a>
             </Button>
-            <form action="/auth/signout" method="post">
-              <Button variant="outline" type="submit">
-                Cerrar Sesión
-              </Button>
-            </form>
+            <LogoutButton />
           </nav>
         </div>
       </header>
