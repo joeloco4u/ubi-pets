@@ -29,7 +29,9 @@ export default function PetsPage() {
   const [errors, setErrors] = useState<{ name?: string; species?: string }>({});
 
   const fetchPets = async () => {
-    const { data } = await supabase.from("pets").select("*");
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase.from("pets").select("*").eq("owner_id", user.id);
     setPets(data || []);
   };
 
