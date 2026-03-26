@@ -17,27 +17,31 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [pet, setPet] = useState<PetData | null>(null);
   const [loading, setLoading] = useState(true);
   const [locationStatus, setLocationStatus] = useState<string>("");
-  const [buttonText, setButtonText] = useState("¡Contactar al dueño!");
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
+  const [gpsRequested, setGpsRequested] = useState(false);
 
   useEffect(() => {
     const init = async () => {
       const { id: petId } = await params;
+      console.log("Solicitando GPS...");
 
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLat(position.coords.latitude);
-          setLng(position.coords.longitude);
-          setLocationStatus("📍 Ubicación capturada");
-          logScan(petId, position.coords.latitude, position.coords.longitude);
-        },
-        () => {
-          setLocationStatus("Ubicación no disponible");
-          logScan(petId, null, null);
-        },
-        { timeout: 5000 }
-      );
+      if (!gpsRequested) {
+        setGpsRequested(true);
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setLat(position.coords.latitude);
+            setLng(position.coords.longitude);
+            setLocationStatus("📍 Ubicación capturada");
+            logScan(petId, position.coords.latitude, position.coords.longitude);
+          },
+          () => {
+            setLocationStatus("Ubicación no disponible");
+            logScan(petId, null, null);
+          },
+          { timeout: 5000 }
+        );
+      }
 
       const { data, error } = await supabase
         .from("pets")
@@ -52,7 +56,26 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     };
 
     init();
-  }, [params]);
+  }, [params, gpsRequested]);
+
+  const requestGps = () => {
+    const getPetId = async () => {
+      const { id: petId } = await params;
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLat(position.coords.latitude);
+          setLng(position.coords.longitude);
+          setLocationStatus("📍 Ubicación capturada");
+          logScan(petId, position.coords.latitude, position.coords.longitude);
+        },
+        () => {
+          setLocationStatus("Ubicación denegada");
+        },
+        { timeout: 5000 }
+      );
+    };
+    getPetId();
+  };
 
   const logScan = async (petId: string, latVal: number | null, lngVal: number | null) => {
     await supabase.from("scans").insert({
@@ -65,20 +88,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const handleContact = () => {
     if (!pet?.owner_phone) return;
     
-    setButtonText("Abriendo WhatsApp...");
-    
-    let message = `Hola, encontré a tu mascota ${pet.name}.`;
-    if (lat && lng) {
-      message += ` Mi ubicación actual es: https://maps.google.com/?q=${lat},${lng}`;
-    }
+    const googleMapsLink = lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : "";
+    const message = lat && lng 
+      ? `Hola! Encontré a tu mascota *${pet.name}*. Mi ubicación actual es: ${googleMapsLink}`
+      : `Hola! Encontré a tu mascota *${pet.name}*. Por favor contáctame.`;
     
     const encodedMessage = encodeURIComponent(message);
     const waUrl = `https://wa.me/${pet.owner_phone.replace(/\D/g, '')}?text=${encodedMessage}`;
     
-    setTimeout(() => {
-      window.open(waUrl, "_blank");
-      setButtonText("¡Contactar al dueño!");
-    }, 500);
+    window.open(waUrl, "_blank");
   };
 
   if (loading) {
@@ -108,9 +126,20 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           <MapPin className="w-3 h-3" /> {locationStatus}
         </div>
       )}
+      
+      {!locationStatus && (
+        <button 
+          onClick={requestGps}
+          className="mb-4 text-sm text-[#FF6B35] font-medium border border-[#FF6B35] px-4 py-2 rounded-full hover:bg-[#FF6B35] hover:text-white transition-colors"
+        >
+          📍 Activar ubicación para reportar hallazgo
+        </button>
+      )}
+      
       <Link href="/" className="text-[#0A2540] hover:text-[#FF6B35] transition-colors mb-4 text-sm font-medium">
         ← Ir a Ubi Pets
       </Link>
+      
       <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 max-w-md w-full text-center">
         <div className="mb-6">
           <div className="bg-[#0A2540] w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -140,7 +169,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-semibold py-4 px-6 rounded-2xl transition-colors flex items-center justify-center gap-2 text-base sm:text-lg touch-manipulation"
           >
             <Phone className="h-5 w-5" />
-            {buttonText}
+            ¡Contactar al dueño!
           </button>
         ) : (
           <button className="w-full bg-gray-300 text-gray-500 font-semibold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 cursor-not-allowed" disabled>

@@ -149,25 +149,28 @@ export default function PetsPage() {
             <p className="col-span-full text-center py-12 text-gray-500">Aún no tienes mascotas. Agrega la primera arriba.</p>
           ) : (
             pets.map((pet) => (
-              <Card key={pet.id} className="p-6 flex flex-col items-center">
-                <div className="text-center mb-4">
-                  <h3 className="text-2xl font-bold text-[#0A2540]">{pet.name}</h3>
-                  <span className="text-sm text-[#FF6B35] font-medium">{pet.species}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <QRCodeGenerator 
-                    data={`${BASE_URL}/p/${pet.id}`}
-                    petName={pet.name} 
-                  />
-                  <button
-                    onClick={() => deletePet(pet.id)}
-                    className="p-3 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Eliminar mascota"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </div>
-              </Card>
+              <div key={pet.id} className="max-w-sm mx-auto w-full">
+                <Card className="p-6 flex flex-col items-center">
+                  <div className="text-center mb-4">
+                    <h3 className="text-2xl font-bold text-[#0A2540]">{pet.name}</h3>
+                    <span className="text-sm text-[#FF6B35] font-medium">{pet.species}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <QRCodeGenerator 
+                      data={`${BASE_URL}/p/${pet.id}`}
+                      petName={pet.name}
+                      size={160}
+                    />
+                    <button
+                      onClick={() => deletePet(pet.id)}
+                      className="p-3 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Eliminar mascota"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                </Card>
+              </div>
             ))
           )}
         </div>
