@@ -1,4 +1,6 @@
 "use client";
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase-browser";
 import { Button } from "@/components/ui/button";
