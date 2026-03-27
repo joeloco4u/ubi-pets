@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase-browser";
+import { createClient } from "@/lib/supabase-browser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +30,7 @@ export default function PetsPage() {
   const [errors, setErrors] = useState<{ name?: string; species?: string }>({});
 
   const fetchPets = async () => {
+    const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const { data } = await supabase.from("pets").select("*").eq("owner_id", user.id);
@@ -57,12 +58,19 @@ export default function PetsPage() {
 
     setLoading(true);
 
+    const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      setMessage("Error: No hay usuario autenticado");
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase.from("pets").insert({
       name,
       species,
-      owner_id: user?.id,
+      owner_id: user.id,
       medical_notes: medicalNotes,
       owner_phone: ownerPhone,
     });
@@ -83,6 +91,7 @@ export default function PetsPage() {
   const deletePet = async (petId: string) => {
     if (!confirm("¿Estás seguro de que quieres eliminar esta mascota?")) return;
     
+    const supabase = createClient();
     const { error } = await supabase.from("pets").delete().eq("id", petId);
     if (!error) {
       await fetchPets();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase-browser";
+import { createClient } from "@/lib/supabase-browser";
 import { Phone, PawPrint, Heart, MapPin } from "lucide-react";
 import Link from "next/link";
 
@@ -23,6 +23,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   useEffect(() => {
     const init = async () => {
       const { id: petId } = await params;
+      const supabase = createClient();
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -54,6 +55,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }, [params]);
 
   const logScan = async (petId: string, latVal: number | null, lngVal: number | null) => {
+    const supabase = createClient();
     await supabase.from("scans").insert({
       pet_id: petId,
       lat: latVal,

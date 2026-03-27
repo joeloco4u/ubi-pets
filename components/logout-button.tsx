@@ -1,11 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/supabase-browser";
+import { createClient } from "@/lib/supabase-browser";
 
 export function LogoutButton() {
   const handleSignOut = async () => {
+    const supabase = createClient();
     await supabase.auth.signOut();
+    localStorage.clear();
+    sessionStorage.clear();
     window.location.href = "/";
   };
 

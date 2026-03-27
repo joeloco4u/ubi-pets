@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase-browser";
+import { createClient } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { PawPrint } from "lucide-react";
@@ -18,6 +18,10 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
+    localStorage.clear();
+    sessionStorage.clear();
+
+    const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
