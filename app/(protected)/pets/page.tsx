@@ -35,7 +35,7 @@ export default function PetsPage() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const { data } = await supabase.from("pets").select("*").eq("owner_id", user.id);
+    const { data } = await supabase.from("pets").select("*", { count: 'exact' }).eq("owner_id", user.id);
     setPets(data || []);
   };
 
@@ -75,7 +75,7 @@ export default function PetsPage() {
       owner_id: user.id,
       medical_notes: medicalNotes,
       owner_phone: ownerPhone,
-    });
+    }, { count: 'exact' });
 
     if (error) {
       setMessage("Error: " + error.message);
