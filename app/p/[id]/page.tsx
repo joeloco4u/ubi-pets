@@ -21,27 +21,32 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [lng, setLng] = useState<number | null>(null);
 
   useEffect(() => {
+    setLocationStatus("📍 Localizando mascota...");
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const latVal = position.coords.latitude;
+        const lngVal = position.coords.longitude;
+        setLat(latVal);
+        setLng(lngVal);
+        setLocationStatus("📍 Ubicación lista para enviar");
+      },
+      () => {
+        setLocationStatus("📍 Ubicación no disponible");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, []);
+
+  useEffect(() => {
     const init = async () => {
       const { id: petId } = await params;
       const supabase = createClient();
 
-      setLocationStatus("📍 Localizando mascota...");
-
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const latVal = position.coords.latitude;
-          const lngVal = position.coords.longitude;
-          setLat(latVal);
-          setLng(lngVal);
-          setLocationStatus("📍 Ubicación lista para enviar");
-          await logScan(petId, latVal, lngVal);
-        },
-        async () => {
-          setLocationStatus("📍 Ubicación no disponible");
-          await logScan(petId, null, null);
-        },
-        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
-      );
+      await supabase.from("scans").insert({
+        pet_id: petId,
+        lat: lat,
+        lng: lng,
+      });
 
       const { data, error } = await supabase
         .from("pets")
@@ -56,7 +61,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     };
 
     init();
-  }, [params]);
+  }, [params, lat, lng]);
 
   const logScan = async (petId: string, latVal: number | null, lngVal: number | null) => {
     const supabase = createClient();
