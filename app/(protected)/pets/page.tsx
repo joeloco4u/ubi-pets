@@ -155,32 +155,36 @@ export default function PetsPage() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-4">
           {pets.length === 0 ? (
             <p className="col-span-full text-center py-12 text-gray-500">Aún no tienes mascotas. Agrega la primera arriba.</p>
           ) : (
             pets.map((pet) => (
-              <div key={pet.id} className="max-w-sm mx-auto w-full">
-                <Card className="p-6 flex flex-col items-center">
-                  <div className="text-center mb-4">
-                    <h3 className="text-2xl font-bold text-[#0A2540]">{pet.name}</h3>
-                    <span className="text-sm text-[#FF6B35] font-medium">{pet.species}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
+              <div key={pet.id} className="max-w-[350px] mx-auto w-full">
+                <div className="flex flex-col items-center text-center p-6 bg-white rounded-3xl shadow-md border border-gray-100">
+                  <button
+                    onClick={() => deletePet(pet.id)}
+                    className="self-end p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Eliminar mascota"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <h3 className="text-2xl font-bold text-[#0A2540] capitalize">{pet.name}</h3>
+                  <span className="text-sm text-gray-500 mb-4 uppercase tracking-widest">{pet.species}</span>
+                  <div className="bg-gray-50 p-4 rounded-2xl mb-4">
                     <QRCodeGenerator 
                       data={`${BASE_URL}/p/${pet.id}`}
                       petName={pet.name}
-                      size={160}
+                      size={180}
                     />
-                    <button
-                      onClick={() => deletePet(pet.id)}
-                      className="p-3 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Eliminar mascota"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
                   </div>
-                </Card>
+                  <Link 
+                    href={`/p/${pet.id}`}
+                    className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] text-white rounded-xl py-3"
+                  >
+                    Ver QR
+                  </Link>
+                </div>
               </div>
             ))
           )}
