@@ -25,18 +25,22 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       const { id: petId } = await params;
       const supabase = createClient();
 
+      setLocationStatus("📍 Localizando mascota...");
+
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLat(position.coords.latitude);
-          setLng(position.coords.longitude);
-          setLocationStatus("📍 Ubicación capturada");
-          logScan(petId, position.coords.latitude, position.coords.longitude);
+        async (position) => {
+          const latVal = position.coords.latitude;
+          const lngVal = position.coords.longitude;
+          setLat(latVal);
+          setLng(lngVal);
+          setLocationStatus("📍 Ubicación lista para enviar");
+          await logScan(petId, latVal, lngVal);
         },
-        () => {
-          setLocationStatus("Ubicación no disponible");
-          logScan(petId, null, null);
+        async () => {
+          setLocationStatus("📍 Ubicación no disponible");
+          await logScan(petId, null, null);
         },
-        { enableHighAccuracy: true, timeout: 5000 }
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
       );
 
       const { data, error } = await supabase
@@ -66,10 +70,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const handleContact = () => {
     if (!pet?.owner_phone) return;
     
-    const googleMapsLink = lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : "";
-    const message = lat && lng 
-      ? `Hola! Encontré a tu mascota ${pet.name}. Mi ubicación actual es: ${googleMapsLink}`
-      : `Hola! Encontré a tu mascota ${pet.name}. Por favor contáctame pronto.`;
+    let message: string;
+    if (lat && lng) {
+      const googleMapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
+      message = `¡Hola! Encontré a tu mascota *${pet.name}*. Mi ubicación actual es: ${googleMapsLink}`;
+    } else {
+      message = `¡Hola! Encontré a tu mascota *${pet.name}*. Por favor, contáctame para coordinar la entrega.`;
+    }
     
     const encodedMessage = encodeURIComponent(message);
     const waUrl = `https://wa.me/${pet.owner_phone.replace(/\D/g, '')}?text=${encodedMessage}`;
