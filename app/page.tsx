@@ -4,7 +4,7 @@ import { PawPrint, MapPin, QrCode } from "lucide-react";
 export default function Home() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0A2540" }}>
-      <header className="container mx-auto px-4 py-6 flex items-center justify-between">
+      <header className="container mx-auto px-4 py-6 flex justify-between items-center gap-4">
         <div className="flex items-center gap-2">
           <PawPrint className="h-8 w-8" style={{ color: "#FF6B35" }} />
           <span className="font-bold text-2xl text-white">Ubi Pets</span>
@@ -12,13 +12,13 @@ export default function Home() {
         <nav className="flex gap-4">
           <Link
             href="/login"
-            className="px-4 py-2 text-white font-medium hover:opacity-80 transition-opacity"
+            className="px-3 py-2 text-white font-medium text-sm hover:opacity-80 transition-opacity"
           >
             Iniciar sesión
           </Link>
           <Link
             href="/register"
-            className="px-4 py-2 text-white font-semibold rounded-lg"
+            className="px-3 py-2 text-white font-semibold rounded-lg text-sm"
             style={{ backgroundColor: "#FF6B35" }}
           >
             Registrarse
@@ -26,26 +26,26 @@ export default function Home() {
         </nav>
       </header>
 
-      <main className="container mx-auto px-4 py-16">
+      <main className="container mx-auto px-4 py-16 max-w-screen-xl">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-white mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold leading-tight text-white mb-6 px-2">
             Protege a tu mascota con QR y geolocalización
           </h1>
           <p className="text-xl text-gray-300 mb-12">
             La solución completa para mantener a tu mascota segura. Código QR único,
             ubicación en tiempo real y recuperación garantizada.
           </p>
-          <div className="flex gap-6 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/register"
-              className="px-8 py-4 text-white font-semibold rounded-lg text-lg"
+              className="w-full sm:w-auto px-8 py-4 text-white font-semibold rounded-lg text-lg"
               style={{ backgroundColor: "#FF6B35" }}
             >
               Registrarse
             </Link>
             <Link
               href="/login"
-              className="px-8 py-4 text-white font-semibold rounded-lg text-lg border-2 border-white hover:bg-white/10 transition-colors"
+              className="w-full sm:w-auto px-8 py-4 text-white font-semibold rounded-lg text-lg border-2 border-white hover:bg-white/10 transition-colors"
             >
               Iniciar sesión
             </Link>
