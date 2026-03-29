@@ -19,11 +19,30 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [locationStatus, setLocationStatus] = useState<string>("");
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
+  const [showGpsButton, setShowGpsButton] = useState(false);
+
+  const requestGps = () => {
+    setLocationStatus("📍 Solicitando ubicación...");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const latVal = position.coords.latitude;
+        const lngVal = position.coords.longitude;
+        setLat(latVal);
+        setLng(lngVal);
+        setLocationStatus("📍 Ubicación lista para enviar");
+        setShowGpsButton(false);
+      },
+      () => {
+        setLocationStatus("📍 No se pudo obtener ubicación");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   useEffect(() => {
     setLocationStatus("📍 Localizando mascota...");
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
+      (position) => {
         const latVal = position.coords.latitude;
         const lngVal = position.coords.longitude;
         setLat(latVal);
@@ -32,6 +51,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       },
       () => {
         setLocationStatus("📍 Ubicación no disponible");
+        setShowGpsButton(true);
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
@@ -77,8 +97,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     
     let message: string;
     if (lat && lng) {
-      const googleMapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
-      message = `¡Hola! Encontré a tu mascota *${pet.name}*. Mi ubicación actual es: ${googleMapsLink}`;
+      const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+      message = `¡Hola! Encontré a tu mascota *${pet.name}*. Mi ubicación es: ${googleMapsLink}`;
     } else {
       message = `¡Hola! Encontré a tu mascota *${pet.name}*. Por favor, contáctame para coordinar la entrega.`;
     }
@@ -115,6 +135,16 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         <div className="text-xs text-gray-400 mb-2 flex items-center gap-1">
           <MapPin className="w-3 h-3" /> {locationStatus}
         </div>
+      )}
+      
+      {showGpsButton && (
+        <button
+          onClick={requestGps}
+          className="mb-3 bg-[#0A2540] text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-[#1a3a5c] transition-colors"
+        >
+          <MapPin className="w-4 h-4" />
+          📍 Activar GPS para ayudar a la mascota
+        </button>
       )}
       
       <Link href="/" className="text-[#0A2540] hover:text-[#FF6B35] transition-colors mb-4 text-sm font-medium">
