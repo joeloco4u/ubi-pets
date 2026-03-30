@@ -9,15 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PawPrint, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { QRCodeGenerator } from "@/components/qr-code";
-import { z } from "zod";
-
-const petSchema = z.object({
-  name: z.string().min(1, "El nombre es requerido"),
-  species: z.string().refine(
-    (val) => ["perro", "gato"].includes(val.toLowerCase()),
-    { message: "La especie debe ser Perro o Gato" }
-  ),
-});
 
 const BASE_URL = "https://ubi-petsweb.vercel.app";
 
@@ -48,13 +39,9 @@ export default function PetsPage() {
     setErrors({});
     setMessage("");
 
-    const result = petSchema.safeParse({ name, species });
-    if (!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors;
-      setErrors({
-        name: fieldErrors.name?.[0],
-        species: fieldErrors.species?.[0],
-      });
+    const cleanSpecies = species.trim().toLowerCase();
+    if (cleanSpecies !== 'perro' && cleanSpecies !== 'gato') {
+      setErrors({ species: "La especie debe ser Perro o Gato" });
       return;
     }
 
@@ -69,9 +56,11 @@ export default function PetsPage() {
       return;
     }
 
+    const speciesCapitalized = cleanSpecies.charAt(0).toUpperCase() + cleanSpecies.slice(1);
+
     const { error } = await supabase.from("pets").insert({
       name,
-      species,
+      species: speciesCapitalized,
       owner_id: user.id,
       medical_notes: medicalNotes,
       owner_phone: ownerPhone,
@@ -121,12 +110,16 @@ export default function PetsPage() {
                 {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
               </div>
               <div>
-                <Input 
-                  placeholder="Especie (perro, gato...)" 
-                  value={species} 
-                  onChange={e => setSpecies(e.target.value)} 
-                  required 
-                />
+                <select
+                  value={species}
+                  onChange={e => setSpecies(e.target.value)}
+                  required
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="">Selecciona especie</option>
+                  <option value="perro">Perro</option>
+                  <option value="gato">Gato</option>
+                </select>
                 {errors.species && <p className="text-red-500 text-sm mt-1">{errors.species}</p>}
               </div>
               <div>
