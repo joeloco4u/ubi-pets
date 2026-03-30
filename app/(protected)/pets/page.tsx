@@ -20,7 +20,7 @@ export default function PetsPage() {
   const [ownerPhone, setOwnerPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [errors, setErrors] = useState<{ name?: string; species?: string }>({});
+  const [errors, setErrors] = useState<{ name?: string; species?: string; phone?: string }>({});
 
   const fetchPets = async () => {
     const supabase = createClient();
@@ -58,12 +58,23 @@ export default function PetsPage() {
 
     const speciesCapitalized = cleanSpecies.charAt(0).toUpperCase() + cleanSpecies.slice(1);
 
+    let cleanPhone = ownerPhone.replace(/\s/g, "");
+    if (cleanPhone.startsWith("0")) {
+      cleanPhone = "+58" + cleanPhone.substring(1);
+    }
+    const phoneRegex = /^\+58\d{10}$/;
+    if (ownerPhone && !phoneRegex.test(cleanPhone)) {
+      setErrors({ phone: "El formato debe ser +58 seguido de 10 dígitos" });
+      setLoading(false);
+      return;
+    }
+
     const { error } = await supabase.from("pets").insert({
       name,
       species: speciesCapitalized,
       owner_id: user.id,
       medical_notes: medicalNotes,
-      owner_phone: ownerPhone,
+      owner_phone: cleanPhone || null,
     }, { count: 'exact' });
 
     if (error) {
@@ -131,10 +142,12 @@ export default function PetsPage() {
               </div>
               <div>
                 <Input 
-                  placeholder="Teléfono de contacto" 
+                  placeholder="+58 412 1234567" 
                   value={ownerPhone} 
                   onChange={e => setOwnerPhone(e.target.value)} 
                 />
+                <p className="text-xs text-gray-400 mt-1">Formato requerido: +58 4XX XXXXXXX</p>
+                {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
               </div>
               <Button type="submit" disabled={loading} className="w-full bg-[#FF6B35]">
                 <Plus className="mr-2 h-4 w-4" /> {loading ? "Guardando..." : "Agregar Mascota"}
