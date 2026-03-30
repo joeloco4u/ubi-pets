@@ -9,6 +9,8 @@ interface PetData {
   id: string;
   name: string;
   species: string;
+  breed: string | null;
+  weight: number | null;
   medical_notes: string | null;
   owner_phone: string | null;
 }
@@ -160,9 +162,24 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         
         <h1 className="text-3xl sm:text-4xl font-bold text-[#0A2540] mb-3">{pet.name}</h1>
         
-        <span className="inline-block bg-[#FF7F50] text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+        <span className="inline-block bg-[#FF7F50] text-white px-4 py-2 rounded-full text-sm font-medium mb-3">
           {pet.species}
         </span>
+
+        {(pet.breed || pet.weight) && (
+          <div className="flex justify-center gap-2 mb-6">
+            {pet.breed && (
+              <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-medium">
+                {pet.breed}
+              </span>
+            )}
+            {pet.weight && (
+              <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-medium">
+                {pet.weight} kg
+              </span>
+            )}
+          </div>
+        )}
 
         {pet.medical_notes && (
           <div className="mb-6 p-4 bg-blue-50 rounded-xl text-left">
