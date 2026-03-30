@@ -16,6 +16,8 @@ export default function PetsPage() {
   const [pets, setPets] = useState<any[]>([]);
   const [name, setName] = useState("");
   const [species, setSpecies] = useState("");
+  const [breed, setBreed] = useState("");
+  const [weight, setWeight] = useState("");
   const [medicalNotes, setMedicalNotes] = useState("");
   const [ownerPhone, setOwnerPhone] = useState("");
   const [loading, setLoading] = useState(false);
@@ -72,6 +74,8 @@ export default function PetsPage() {
     const { error } = await supabase.from("pets").insert({
       name,
       species: speciesCapitalized,
+      breed: breed || null,
+      weight: weight ? parseFloat(weight) : null,
       owner_id: user.id,
       medical_notes: medicalNotes,
       owner_phone: cleanPhone || null,
@@ -83,6 +87,8 @@ export default function PetsPage() {
       setMessage("¡Mascota agregada correctamente!");
       setName("");
       setSpecies("");
+      setBreed("");
+      setWeight("");
       setMedicalNotes("");
       setOwnerPhone("");
       await fetchPets();
@@ -135,6 +141,21 @@ export default function PetsPage() {
               </div>
               <div>
                 <Input 
+                  placeholder="Raza (Ej. Golden Retriever)" 
+                  value={breed} 
+                  onChange={e => setBreed(e.target.value)} 
+                />
+              </div>
+              <div>
+                <Input 
+                  type="number"
+                  placeholder="Peso en kg" 
+                  value={weight} 
+                  onChange={e => setWeight(e.target.value)} 
+                />
+              </div>
+              <div>
+                <Input 
                   placeholder="Alergias o medicamentos" 
                   value={medicalNotes} 
                   onChange={e => setMedicalNotes(e.target.value)} 
@@ -176,7 +197,14 @@ export default function PetsPage() {
                     <Trash2 className="w-4 h-4" />
                   </button>
                   <h3 className="text-2xl font-bold text-[#0A2540] capitalize">{pet.name}</h3>
-                  <span className="text-sm text-gray-500 mb-4 uppercase tracking-widest">{pet.species}</span>
+                  <span className="text-sm text-gray-500 uppercase tracking-widest">{pet.species}</span>
+                  {(pet.breed || pet.weight) && (
+                    <span className="text-xs text-gray-500 italic mt-1">
+                      {pet.breed && `Raza: ${pet.breed}`}
+                      {pet.breed && pet.weight && " | "}
+                      {pet.weight && `${pet.weight} kg`}
+                    </span>
+                  )}
                   <div className="bg-gray-50 p-4 rounded-2xl mb-4">
                     <QRCodeGenerator 
                       data={`${BASE_URL}/p/${pet.id}`}
