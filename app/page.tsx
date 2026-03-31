@@ -83,9 +83,9 @@ export default function Home() {
             Bienvenidos
           </h2>
           <p className="text-lg leading-relaxed" style={{ color: "#4A5568" }}>
-            En Ubi Pets creemos que cada mascota merece una segunda oportunidad 
-            para volver a casa. Por eso hemos creado una plataforma innovadora 
-            que combina tecnología QR avanzada con geolocalización en tiempo real, 
+            En Ubi Pets creemos que cada mascota merece una segunda oportunidad
+            para volver a casa. Por eso hemos creado una plataforma innovadora
+            que combina tecnología QR avanzada con geolocalización en tiempo real,
             para que nunca pierdas de vista a tu compañero fiel.
           </p>
         </div>
@@ -97,10 +97,10 @@ export default function Home() {
             Quiénes Somos
           </h2>
           <p className="text-lg leading-relaxed" style={{ color: "#4A5568" }}>
-            Somos un equipo de amantes de los animales comprometidos con la seguridad 
-            y bienestar de las mascotas. Desarrollamos Ubi Pets para resolver un problema 
-            que afecta a millones de familias: la pérdida de sus compañeros peludos. 
-            Nuestra misión es简单: conectar a las mascotas con sus dueños mediante 
+            Somos un equipo de amantes de los animales comprometidos con la seguridad
+            y bienestar de las mascotas. Desarrollamos Ubi Pets para resolver un problema
+            que afecta a millones de familias: la pérdida de sus compañeros peludos.
+            Nuestra misión es: conectar a las mascotas con sus dueños mediante
             tecnología accesible y confiable.
           </p>
         </div>
@@ -118,7 +118,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold mb-2" style={{ color: "#0A2540" }}>Información sin límites</h3>
               <p className="text-gray-600" style={{ color: "#4A5568" }}>
-                Toda la información de tu mascota siempre disponible. 
+                Toda la información de tu mascota siempre disponible.
                 Salud, vacunas, contactos de emergencia y más.
               </p>
             </div>
@@ -128,7 +128,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold mb-2" style={{ color: "#0A2540" }}>Geolocalización instantánea</h3>
               <p className="text-gray-600" style={{ color: "#4A5568" }}>
-                Know exactly where your pet is at all times with real-time tracking.
+                Sepa exactamente dónde está su mascota en todo momento con el seguimiento en tiempo real.
               </p>
             </div>
             <div className="text-center p-6">
