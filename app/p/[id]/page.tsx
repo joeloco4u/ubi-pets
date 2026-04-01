@@ -13,6 +13,8 @@ interface PetData {
   weight: number | null;
   medical_notes: string | null;
   owner_phone: string | null;
+  character: string | null;
+  address: string | null;
 }
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
@@ -166,20 +168,28 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           {pet.species}
         </span>
 
-        {(pet.breed || pet.weight) && (
-          <div className="flex justify-center gap-2 mb-6">
-            {pet.breed && (
-              <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-medium">
-                {pet.breed}
+          {(pet.breed || pet.weight) && (
+            <div className="flex justify-center gap-2 mb-6">
+              {pet.breed && (
+                <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-medium">
+                  {pet.breed}
+                </span>
+              )}
+              {pet.weight && (
+                <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-medium">
+                  {pet.weight} kg
+                </span>
+              )}
+            </div>
+          )}
+
+          {pet.character && (
+            <div className={`mb-6 p-3 rounded-xl text-center ${pet.character === 'Agresivo' ? 'bg-orange-100 border border-orange-300' : 'bg-gray-50'}`}>
+              <span className={`text-sm font-medium ${pet.character === 'Agresivo' ? 'text-orange-700' : 'text-gray-600'}`}>
+                Temperamento: {pet.character}
               </span>
-            )}
-            {pet.weight && (
-              <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-medium">
-                {pet.weight} kg
-              </span>
-            )}
-          </div>
-        )}
+            </div>
+          )}
 
         {pet.medical_notes && (
           <div className="mb-6 p-4 bg-blue-50 rounded-xl text-left">
@@ -188,6 +198,16 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               Información Médica
             </h3>
             <p className="text-gray-700 text-sm">{pet.medical_notes}</p>
+          </div>
+        )}
+
+        {pet.address && (
+          <div className="mb-6 p-4 bg-green-50 rounded-xl text-left">
+            <h3 className="flex items-center gap-2 text-[#0A2540] font-semibold mb-2">
+              <MapPin className="h-4 w-4 text-[#FF6B35]" />
+              📍 Dirección de residencia
+            </h3>
+            <p className="text-gray-700 text-sm">{pet.address}</p>
           </div>
         )}
 

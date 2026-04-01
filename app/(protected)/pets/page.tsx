@@ -20,6 +20,8 @@ export default function PetsPage() {
   const [weight, setWeight] = useState("");
   const [medicalNotes, setMedicalNotes] = useState("");
   const [ownerPhone, setOwnerPhone] = useState("");
+  const [character, setCharacter] = useState("");
+  const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<{ name?: string; species?: string; phone?: string }>({});
@@ -79,6 +81,8 @@ export default function PetsPage() {
       owner_id: user.id,
       medical_notes: medicalNotes,
       owner_phone: cleanPhone || null,
+      character: character || null,
+      address: address || null,
     }, { count: 'exact' });
 
     if (error) {
@@ -91,6 +95,8 @@ export default function PetsPage() {
       setWeight("");
       setMedicalNotes("");
       setOwnerPhone("");
+      setCharacter("");
+      setAddress("");
       await fetchPets();
     }
     setLoading(false);
@@ -169,6 +175,26 @@ export default function PetsPage() {
                 />
                 <p className="text-xs text-gray-400 mt-1">Formato requerido: +58 4XX XXXXXXX</p>
                 {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+              </div>
+              <div>
+                <select
+                  value={character}
+                  onChange={e => setCharacter(e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="">Selecciona carácter</option>
+                  <option value="Dócil">Dócil</option>
+                  <option value="Agresivo">Agresivo</option>
+                  <option value="Cariñoso">Cariñoso</option>
+                  <option value="Tímido">Tímido</option>
+                </select>
+              </div>
+              <div>
+                <Input 
+                  placeholder="Ej. Calle 72 con Av. 15..." 
+                  value={address} 
+                  onChange={e => setAddress(e.target.value)} 
+                />
               </div>
               <Button type="submit" disabled={loading} className="w-full bg-[#FF6B35]">
                 <Plus className="mr-2 h-4 w-4" /> {loading ? "Guardando..." : "Agregar Mascota"}
